@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -234,7 +234,96 @@ const CardDescription = styled.p`
   }
 `;
 
+const VideoContainer = styled.div`
+  position: relative;
+  width: 100%;
+  margin-bottom: 3rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  
+  /* Maintain 16:9 aspect ratio */
+  aspect-ratio: 16 / 9;
+  
+  ${mediaQueries.md} {
+    margin-bottom: 2rem;
+  }
+  
+  ${mediaQueries.sm} {
+    margin-bottom: 1.5rem;
+  }
+`;
+
+const CategoryLink = styled(Link)`
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: ${props => props.theme.colors.secondary};
+  height: 300px;
+  display: block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  ${mediaQueries.md} {
+    height: 250px;
+  }
+  
+  ${mediaQueries.sm} {
+    height: 220px;
+  }
+`;
+
+  const SoundToggle = styled.button`
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 0.9rem;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.9);
+    }
+  `;
+
+  const YouTubeEmbed = ({ videoId }: { videoId: string }) => {
+    const [isMuted, setIsMuted] = useState(true);
+
+    const toggleMute = () => {
+      // This requires re-loading the iframe with different parameters
+      setIsMuted(!isMuted);
+    };
+
+    return (
+      <VideoContainer>
+      <iframe
+        width="100%"
+        height="100%"
+        src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${videoId}`}
+        title="Jeremiah Manzano Showreel"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+      <SoundToggle onClick={toggleMute}>
+        {isMuted ? "Unmute 🔇" : "Mute 🔊"}
+      </SoundToggle>
+    </VideoContainer>
+    );
+  };
+
 const WorkShowcase: React.FC = () => {
+  const showreelVideoId = 'zHbvM82MVXw';
   return (
     <ShowcaseSection>
       <SectionHeader>
@@ -242,16 +331,7 @@ const WorkShowcase: React.FC = () => {
       </SectionHeader>
       
       <WorksGrid>
-        <FeaturedVideo>
-          <Image
-            src="/images/hero-portrait.jpg"
-            alt="Jeremiah Manzano Showreel"
-            fill
-            style={{ objectFit: 'cover' }}
-          />
-          <VideoOverlay />
-          <PlayButton />
-        </FeaturedVideo>
+        <YouTubeEmbed videoId={showreelVideoId} />
         
         <WorksCategories>
           <Link href="/picture" passHref>

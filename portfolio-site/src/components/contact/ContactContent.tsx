@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { mediaQueries } from '../styles/mixins';
+import DOMPurify from 'dompurify';
 
 const ContactSection = styled.section`
   display: grid;
