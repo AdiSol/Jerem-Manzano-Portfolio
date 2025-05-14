@@ -53,7 +53,7 @@ interface NavLinkProps {
   $active?: boolean;
 }
 
-const NavLink = styled.a<NavLinkProps>`
+const NavLink = styled(Link)<{ $active?: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
   border-radius: 4px;
@@ -67,6 +67,7 @@ const NavLink = styled.a<NavLinkProps>`
     width: 100%;
     text-align: center;
     padding: 0.75rem 1rem;
+    display: block;
   }
 `;
 
@@ -124,18 +125,18 @@ const Header: React.FC = () => {
       <Overlay $isOpen={isMenuOpen} onClick={closeMenu} />
       
       <Nav $isOpen={isMenuOpen}>
-        <Link href="/" passHref>
-          <NavLink $active onClick={closeMenu}>Home</NavLink>
-        </Link>
-        <Link href="/picture" passHref>
-          <NavLink onClick={closeMenu}>Picture</NavLink>
-        </Link>
-        <Link href="/video" passHref>
-          <NavLink onClick={closeMenu}>Video</NavLink>
-        </Link>
-        <Link href="/contact" passHref>
-          <NavLink onClick={closeMenu}>Contact</NavLink>
-        </Link>
+        <NavLink href="/" $active onClick={closeMenu}>
+          Home
+        </NavLink>
+        <NavLink href="/picture" onClick={closeMenu}>
+          Picture
+        </NavLink>
+        <NavLink href="/video" onClick={closeMenu}>
+          Video
+        </NavLink>
+        <NavLink href="/contact" onClick={closeMenu}>
+          Contact
+        </NavLink>
       </Nav>
     </HeaderContainer>
   );

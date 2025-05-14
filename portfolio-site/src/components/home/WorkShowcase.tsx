@@ -244,23 +244,20 @@ const WorkShowcase: React.FC = () => {
       <WorksGrid>
         <FeaturedVideo>
           <Image
-            src="/images/hero-video-thumbnail.jpg"
+            src="/images/hero-portrait.jpg"
             alt="Jeremiah Manzano Showreel"
             fill
             style={{ objectFit: 'cover' }}
           />
           <VideoOverlay />
           <PlayButton />
-          <VideoTitle>
-            <h3>Jeremiah Manzano</h3>
-          </VideoTitle>
         </FeaturedVideo>
         
         <WorksCategories>
           <Link href="/picture" passHref>
             <CategoryCard>
               <Image
-                src="/images/car-showcase.jpg"
+                src="/images/picture-showcase.jpg"
                 alt="Photography showcase"
                 fill
                 style={{ objectFit: 'cover' }}

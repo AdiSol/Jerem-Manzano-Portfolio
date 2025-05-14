@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { mediaQueries } from '../styles/mixins';
+import { FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 
 const FooterContainer = styled.footer`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -68,6 +69,8 @@ const SocialIcon = styled.a`
   
   &:hover {
     background-color: ${({ theme }) => theme.colors.primary};
+    width: 45px;
+    height: 45px;
   }
   
   ${mediaQueries.sm}{
@@ -110,29 +113,16 @@ const Footer: React.FC = () => {
           <SectionTitle>Follow me</SectionTitle>
           <div>Jerem.M</div>
           <SocialIcons>
-            <SocialIcon href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-              <span>IG</span>
+            <SocialIcon href="https://www.instagram.com/jeremiah.manzano/" target="_blank" rel="noopener noreferrer">
+              <FaInstagram />
             </SocialIcon>
             <SocialIcon href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-              <span>FB</span>
+              <FaFacebook />
             </SocialIcon>
-            <SocialIcon href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-              <span>YT</span>
+            <SocialIcon href="https://www.youtube.com/@CapuleStudios" target="_blank" rel="noopener noreferrer">
+              <FaYoutube />
             </SocialIcon>
           </SocialIcons>
-        </FooterSection>
-        <FooterSection>
-          <FooterNav>
-            <Link href="/" passHref>
-              <NavItem>Home</NavItem>
-            </Link>
-            <Link href="/picture" passHref>
-              <NavItem>Pictures</NavItem>
-            </Link>
-            <Link href="/video" passHref>
-              <NavItem>Video</NavItem>
-            </Link>
-          </FooterNav>
         </FooterSection>
       </FooterContent>
     </FooterContainer>
