@@ -115,10 +115,14 @@ const Label = styled.label`
   color: ${props => props.theme.colors.text};
 `;
 
-const Input = styled.input`
+interface InputProps {
+    $hasError?: boolean;
+}
+
+const Input = styled.input<InputProps>`
   padding: 1rem;
   background-color: #1e1e24;
-  border: 1px solid #2c2c34;
+  border: 1px solid ${props => props.$hasError ? '#ff5252' : '#2c2c34'};
   border-radius: 4px;
   color: ${props => props.theme.colors.text};
   font-size: 1rem;
@@ -126,14 +130,14 @@ const Input = styled.input`
   
   &:focus {
     outline: none;
-    border-color: ${props => props.theme.colors.primary};
+    border-color: ${props => props.$hasError ? '#ff5252' : props.theme.colors.primary};
   }
 `;
 
-const TextArea = styled.textarea`
+const TextArea = styled.textarea<InputProps>`
   padding: 1rem;
   background-color: #1e1e24;
-  border: 1px solid #2c2c34;
+  border: 1px solid ${props => props.$hasError ? '#ff5252' : '#2c2c34'};
   border-radius: 4px;
   color: ${props => props.theme.colors.text};
   font-size: 1rem;
@@ -143,7 +147,7 @@ const TextArea = styled.textarea`
   
   &:focus {
     outline: none;
-    border-color: ${props => props.theme.colors.primary};
+    border-color: ${props => props.$hasError ? '#ff5252' : props.theme.colors.primary};
   }
 `;
 
@@ -190,10 +194,22 @@ const ErrorMessage = styled.div`
   margin-top: 1rem;
 `;
 
+const FieldError = styled.div`
+  font-size: 0.85rem;
+  color: #ff5252;
+  margin-top: 0.25rem;
+`;
+
 interface FormData {
   name: string;
   email: string;
   message: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  message?: string;
 }
 
 const ContactContent: React.FC = () => {
@@ -203,59 +219,169 @@ const ContactContent: React.FC = () => {
     message: ''
   });
   
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  
-  const accessKey = 'ec9d7a60-b89a-4416-874f-e8962266dc49';
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [submitTime, setSubmitTime] = useState<number | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const accessKey = 'ec9d7a60-b89a-4416-874f-e8962266dc49';
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('loading');
-    
-    try {
-        const response = await fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify({
-                access_key: accessKey,
-                name: formData.name,
-                email: formData.email,
-                message: formData.message,
-                subject: `New contact from ${formData.name} via Jerem Portfolio`,
-            }),
-        });
-        const result = await response.json();
-        if (result.success) {
-              setFormData({
-                name: '',
-                email: '',
-                message: ''
-              });
-            setStatus('success');
+    if (errors[name as keyof FormErrors]) {
+        setErrors(prev => ({
+          ...prev,
+          [name]: undefined
+        }));
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    };
+    const validateEmail = (email: string): boolean => {
+        // RFC 5322 compliant email regex
+        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return emailRegex.test(email);
+      };
+      
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
+        let isValid = true;
+        
+        // Validate name
+        if (!formData.name.trim()) {
+          newErrors.name = 'Name is required';
+          isValid = false;
+        } else if (formData.name.trim().length < 2) {
+          newErrors.name = 'Name must be at least 2 characters';
+          isValid = false;
         }
+        
+        // Validate email
+        if (!formData.email.trim()) {
+          newErrors.email = 'Email is required';
+          isValid = false;
+        } else if (!validateEmail(formData.email.trim())) {
+          newErrors.email = 'Please enter a valid email address';
+          isValid = false;
+        }
+        
+        // Validate message
+        if (!formData.message.trim()) {
+          newErrors.message = 'Message is required';
+          isValid = false;
+        } else if (formData.message.trim().length < 10) {
+          newErrors.message = 'Message must be at least 10 characters';
+          isValid = false;
+        }
+        
+        setErrors(newErrors);
+        return isValid;
+    };
+      
+    const sanitizeData = (data: FormData): FormData => {
+        return {
+          name: DOMPurify.sanitize(data.name.trim()),
+          email: DOMPurify.sanitize(data.email.trim().toLowerCase()),
+          message: DOMPurify.sanitize(data.message.trim())
+        };
+    };
 
-        // Reset status after 5 seconds
-      setTimeout(() => {
-        setStatus('idle');
-      }, 5000);
-
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setStatus('error');
-    }
-  };
-  
-  const isFormValid = formData.name && formData.email && formData.message;
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // Record submit time for anti-spam timing check
+        const currentTime = Date.now();
+        const timeSincePageLoad = submitTime ? currentTime - submitTime : null;
+        
+        // If form was submitted too quickly (less than 3 seconds), likely a bot
+        if (submitTime === null) {
+          setSubmitTime(currentTime);
+        } else if (timeSincePageLoad && timeSincePageLoad < 3000) {
+          console.log('Form submitted too quickly, likely a bot');
+          setStatus('error');
+          return;
+        }
+        
+        // Validate form
+        if (!validateForm()) {
+          return;
+        }
+        
+        // Sanitize data
+        const sanitizedData = sanitizeData(formData);
+        
+        setStatus('loading');
+        
+        try {
+          // Add a timestamp to request body for rate limiting and analysis
+          const requestBody = {
+            access_key: accessKey,
+            name: sanitizedData.name,
+            email: sanitizedData.email,
+            message: sanitizedData.message,
+            subject: `New contact from ${sanitizedData.name} via Portfolio`,
+            timestamp: new Date().toISOString(),
+            from_page: window.location.href
+          };
+          
+          // Log submission attempt (without sensitive data) for debugging
+          console.log('Submitting form...', { 
+            time: new Date().toISOString(),
+            page: window.location.href
+          });
+          
+          const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Clear form and set success state
+            setFormData({
+              name: '',
+              email: '',
+              message: ''
+            });
+            setStatus('success');
+            
+            // Reset success message after 5 seconds
+            setTimeout(() => {
+              setStatus('idle');
+            }, 5000);
+          } else {
+            console.error('Error submitting form:', result);
+            setStatus('error');
+          }
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          setStatus('error');
+        }
+      };
+      
+      const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        
+        // Validate fields on blur for immediate feedback
+        if (name === 'name' && !value.trim()) {
+          setErrors(prev => ({ ...prev, name: 'Name is required' }));
+        } else if (name === 'email') {
+          if (!value.trim()) {
+            setErrors(prev => ({ ...prev, email: 'Email is required' }));
+          } else if (!validateEmail(value)) {
+            setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+          }
+        } else if (name === 'message' && !value.trim()) {
+          setErrors(prev => ({ ...prev, message: 'Message is required' }));
+        }
+      };
   
   return (
     <ContactSection>
@@ -266,63 +392,87 @@ const ContactContent: React.FC = () => {
         </ContactSubtitle>
       </ContactInfo>
       
-      <FormContainer>
+    <FormContainer>
         <ContactForm onSubmit={handleSubmit}>
-        <input type="hidden" name="access_key" value={accessKey} />
-        <input type="checkbox" name="botcheck" style={{ display: 'none' }} />
-          <FormGroup>
+            <input type="hidden" name="access_key" value={accessKey} />
+            <input type="hidden" name="subject" value={`New contact from ${formData.name} via Portfolio`} />
+            <input 
+                type="checkbox" 
+                name="botcheck" 
+                style={{ display: 'none' }} 
+                tabIndex={-1}
+                aria-hidden="true"
+            />
+             <input 
+                type="hidden" 
+                name="timestamp" 
+                value={submitTime?.toString() || ''} 
+            />
+            <FormGroup>
             <Label htmlFor="name">Name</Label>
             <Input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                $hasError={!!errors.name}
+                maxLength={100}
+                required
             />
-          </FormGroup>
+            {errors.name && <FieldError>{errors.name}</FieldError>}
+            </FormGroup>
           
-          <FormGroup>
+            <FormGroup>
             <Label htmlFor="email">Email</Label>
             <Input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                $hasError={!!errors.email}
+                maxLength={150}
+                required
             />
-          </FormGroup>
-          
-          <FormGroup>
+            {errors.email && <FieldError>{errors.email}</FieldError>}
+            </FormGroup>
+            
+            <FormGroup>
             <Label htmlFor="message">Message</Label>
             <TextArea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              required
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                $hasError={!!errors.message}
+                maxLength={3000}
+                required
             />
-          </FormGroup>
-          
-          <SubmitButton 
+            {errors.message && <FieldError>{errors.message}</FieldError>}
+            </FormGroup>
+            
+            <SubmitButton 
             type="submit" 
-            disabled={!isFormValid || status === 'loading'}
-          >
+            disabled={status === 'loading' || Object.keys(errors).length > 0}
+            >
             {status === 'loading' ? 'Sending...' : 'Let\'s get started'}
-          </SubmitButton>
-          
-          {status === 'success' && (
+            </SubmitButton>
+            
+            {status === 'success' && (
             <SuccessMessage>
-              Your message has been sent successfully! I'll get back to you soon.
+                Your message has been sent successfully! I'll get back to you soon.
             </SuccessMessage>
-          )}
-          
-          {status === 'error' && (
+            )}
+            
+            {status === 'error' && (
             <ErrorMessage>
-              There was an error sending your message. Please try again later.
+                There was an error sending your message. Please try again later.
             </ErrorMessage>
-          )}
+            )}
         </ContactForm>
       </FormContainer>
     </ContactSection>

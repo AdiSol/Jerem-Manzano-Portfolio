@@ -92,11 +92,6 @@ const HeroContent = styled.div`
     max-width: 90%;
     /* Add text shadow for better readability on mobile */
     
-    
-    /* Optional: add a semi-transparent background behind text on mobile */
-    // background-color: rgba(36, 7, 69, 0.5);
-    // padding: 1rem;
-    // border-radius: 8px;
   }
 `;
 
