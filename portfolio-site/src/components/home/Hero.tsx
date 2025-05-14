@@ -33,14 +33,44 @@ const HeroImage = styled.div`
   z-index: 1;
 `;
 
+const ImageWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  
+  /* On mobile, position the image with object-position to show the left side */
+  ${mediaQueries.md} {
+    & > img {
+      object-position: left center !important;
+    }
+  }
+`;
+
 const Overlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 1%);
+  /* Enhanced gradient with darker bottom for better text contrast */
+  background: linear-gradient(
+    to bottom, 
+    rgba(0, 0, 0, 0) 0%, 
+    rgba(0, 0, 0, 0.35) 70%, 
+    rgba(0, 0, 0, 0.06) 100%
+  );
   z-index: 2;
+  
+  ${mediaQueries.md} {
+    /* Even darker gradient for mobile */
+    background: linear-gradient(
+      to bottom, 
+      rgba(0, 0, 0, 0) 0%, 
+      rgba(0,0,0,0.7) 70%, 
+      rgba(0, 0, 0, 0.49) 100%
+    );
+  }
 `;
 
 const HeroContent = styled.div`
@@ -49,6 +79,7 @@ const HeroContent = styled.div`
   right: 1%;
   z-index: 3;
   max-width: 600px;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.8);
   
   ${mediaQueries.md} {
     bottom: 25%;
@@ -59,6 +90,13 @@ const HeroContent = styled.div`
     bottom: 20%;
     left: 5%;
     max-width: 90%;
+    /* Add text shadow for better readability on mobile */
+    
+    
+    /* Optional: add a semi-transparent background behind text on mobile */
+    // background-color: rgba(36, 7, 69, 0.5);
+    // padding: 1rem;
+    // border-radius: 8px;
   }
 `;
 
@@ -93,13 +131,15 @@ const Hero: React.FC = () => {
   return (
     <HeroContainer>
       <HeroImage>
-        <Image
-          src="/images/hero-portrait.jpg"
-          alt="Jeremiah Manzano"
-          fill
-          style={{ objectFit: 'cover' }}
-          priority
-        />
+        <ImageWrapper>
+          <Image
+            src="/images/hero-portrait.jpg"
+            alt="Jeremiah Manzano"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+        </ImageWrapper>
       </HeroImage>
       <Overlay />
       <HeroContent>
