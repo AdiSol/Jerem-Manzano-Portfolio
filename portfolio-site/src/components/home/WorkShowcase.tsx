@@ -60,101 +60,6 @@ const WorksGrid = styled.div`
   }
 `;
 
-const FeaturedVideo = styled.div`
-  position: relative;
-  width: 100%;
-  height: 500px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 3rem;
-  
-  ${mediaQueries.md} {
-    height: 400px;
-    margin-bottom: 2rem;
-  }
-  
-  ${mediaQueries.sm} {
-    height: 300px;
-    margin-bottom: 1.5rem;
-  }
-`;
-
-const PlayButton = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  
-  &:before {
-    content: '';
-    display: block;
-    width: 0;
-    height: 0;
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
-    border-left: 25px solid white;
-    margin-left: 5px;
-  }
-  
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-  
-  ${mediaQueries.sm} {
-    width: 60px;
-    height: 60px;
-    
-    &:before {
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-      border-left: 18px solid white;
-    }
-  }
-`;
-
-const VideoOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2) 100%);
-  z-index: 1;
-`;
-
-const VideoTitle = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 2rem;
-  z-index: 2;
-  
-  h3 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    
-    ${mediaQueries.md} {
-      font-size: 2rem;
-    }
-    
-    ${mediaQueries.sm} {
-      font-size: 1.5rem;
-    }
-  }
-`;
-
 const WorksCategories = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -255,46 +160,23 @@ const VideoContainer = styled.div`
   }
 `;
 
-const CategoryLink = styled(Link)`
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: ${props => props.theme.colors.secondary};
-  height: 300px;
-  display: block;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
+const SoundToggle = styled.button`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 0.9rem;
+
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  ${mediaQueries.md} {
-    height: 250px;
-  }
-  
-  ${mediaQueries.sm} {
-    height: 220px;
+    background: rgba(0, 0, 0, 0.9);
   }
 `;
-
-  const SoundToggle = styled.button`
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 12px;
-    cursor: pointer;
-    z-index: 10;
-    font-size: 0.9rem;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.9);
-    }
-  `;
 
   const YouTubeEmbed = ({ videoId }: { videoId: string }) => {
     const [isMuted, setIsMuted] = useState(true);
