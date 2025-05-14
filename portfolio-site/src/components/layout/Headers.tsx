@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { mediaQueries } from '../styles/mixins';
+import { usePathname } from 'next/navigation';
 
 const HeaderContainer = styled.header`
   display: flex;
@@ -23,7 +24,6 @@ const Logo = styled.div`
   z-index: 10;
 `;
 
-// Use $ prefix for props that shouldn't be passed to the DOM
 interface NavProps {
   $isOpen: boolean;
 }
@@ -105,6 +105,11 @@ const Overlay = styled.div<NavProps>`
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -114,6 +119,17 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
   };
   
+  const isActive = (path: string) => {
+    if (path === '/' && pathname === '/') {
+      return true;
+    }
+    // For other pages, check if pathname starts with the path (to handle nested routes)
+    if (path !== '/' && pathname.startsWith(path)) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <HeaderContainer>
       <Logo>Jerem.M</Logo>
@@ -125,16 +141,16 @@ const Header: React.FC = () => {
       <Overlay $isOpen={isMenuOpen} onClick={closeMenu} />
       
       <Nav $isOpen={isMenuOpen}>
-        <NavLink href="/" $active onClick={closeMenu}>
+        <NavLink href="/" $active={isActive('/')}>
           Home
         </NavLink>
-        <NavLink href="/picture" onClick={closeMenu}>
+        <NavLink href="/picture" $active={isActive('/picture')}>
           Picture
         </NavLink>
-        <NavLink href="/video" onClick={closeMenu}>
+        <NavLink href="/video" $active={isActive('/video')}>
           Video
         </NavLink>
-        <NavLink href="/contact" onClick={closeMenu}>
+        <NavLink href="/contact" $active={isActive('/contact')}>
           Contact
         </NavLink>
       </Nav>
