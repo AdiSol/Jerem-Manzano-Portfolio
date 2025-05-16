@@ -144,12 +144,12 @@ const Header: React.FC = () => {
         <NavLink href="/" $active={isActive('/')}>
           Home
         </NavLink>
-        <NavLink href="/picture" $active={isActive('/picture')}>
+        {/* <NavLink href="/picture" $active={isActive('/picture')}>
           Picture
         </NavLink>
         <NavLink href="/video" $active={isActive('/video')}>
           Video
-        </NavLink>
+        </NavLink> */}
         <NavLink href="/contact" $active={isActive('/contact')}>
           Contact
         </NavLink>
