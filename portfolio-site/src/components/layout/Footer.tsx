@@ -4,7 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { mediaQueries } from '../styles/mixins';
-import { FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { FaInstagram, FaFacebook, FaYoutube, FaTiktok } from 'react-icons/fa';
 
 const FooterContainer = styled.footer`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -116,11 +116,14 @@ const Footer: React.FC = () => {
             <SocialIcon href="https://www.instagram.com/jeremiah.manzano/" target="_blank" rel="noopener noreferrer">
               <FaInstagram />
             </SocialIcon>
-            <SocialIcon href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+            <SocialIcon href="https://www.facebook.com/profile.php?id=61573035246039" target="_blank" rel="noopener noreferrer">
               <FaFacebook />
             </SocialIcon>
             <SocialIcon href="https://www.youtube.com/@CapuleStudios" target="_blank" rel="noopener noreferrer">
               <FaYoutube />
+            </SocialIcon>
+            <SocialIcon href="https://www.tiktok.com/@capulestudios?_t=ZS-8wOhBpUKuCe&_r=1" target="_blank" rel="noopener noreferrer">
+              <FaTiktok />
             </SocialIcon>
           </SocialIcons>
         </FooterSection>
