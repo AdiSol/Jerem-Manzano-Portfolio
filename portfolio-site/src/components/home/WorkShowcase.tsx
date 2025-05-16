@@ -223,6 +223,9 @@ const WorkShowcase: React.FC = () => {
                 alt="Photography showcase"
                 fill
                 style={{ objectFit: 'cover' }}
+                loading="lazy" // Enable lazy loading
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,..."
               />
               <CardOverlay />
               <CardContent>
@@ -241,6 +244,9 @@ const WorkShowcase: React.FC = () => {
                 alt="Video showcase"
                 fill
                 style={{ objectFit: 'cover' }}
+                loading="lazy" // Enable lazy loading
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,..."
               />
               <CardOverlay />
               <CardContent>
