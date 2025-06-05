@@ -1,0 +1,88 @@
+{
+    "title": "Videos",
+    "description": "With special visual effects & animations",
+    "categories": [
+      {
+        "id": "horizontal",
+        "name": "Horizontal",
+        "videos": [
+          {
+            "id": "intro-video",
+            "title": "Introductory Video",
+            "description": "Jeremiah Manzano's introductory video for his video editing capabilities",
+            "youtubeId": "zHbvM82MVXw",
+            "category": "horizontal"
+          }
+        ]
+      },
+      {
+        "id": "vertical",
+        "name": "Vertical",
+        "videos": [
+          {
+            "id": "nostalgia-shorts",
+            "title": "A time where computers and cellphones aren't mainstream!",
+            "description": "90's Childhood Imagination is limitless! 🚀✨ Bringing anime & movies to life! 🎬🎮",
+            "youtubeId": "RGi8lMbtHHg",
+            "category": "vertical"
+          },
+          {
+            "id": "short-1.5",
+            "title": "When your favorite games comes to life",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "_uybSoNEme8",
+            "category": "vertical"
+          },
+          {
+            "id": "short-2", 
+            "title": "An Exciting Life with Manga or Anime!",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "vwWb3E5N45o",
+            "category": "vertical"
+          },
+          {
+            "id": "short-3",
+            "title": "When the PH is too close to the sun!",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "l-uTMXkVPeE",
+            "category": "vertical"
+          },
+          {
+            "id": "short-4",
+            "title": "Be a Better Man!",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "O_MpG85Xxtg",
+            "category": "vertical"
+          },
+          {
+            "id": "short-5",
+            "title": "Next Level Phone Technology!",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "SoK5iU1h8Nc",
+            "category": "vertical"
+          },
+          {
+            "id": "short-6",
+            "title": "So Beautiful that you have two dates in one day!",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "DuGriz0X-Ek",
+            "category": "vertical"
+          },
+          {
+            "id": "short-9",
+            "title": "When your working environment is too toxic",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "F1qSpD8XZ0M",
+            "category": "vertical"
+          },
+          {
+            "id": "short-10",
+            "title": "Best Hybrid Car from Suzuki! Suzuki GL7",
+            "description": "[DESCRIPTION NEEDED]",
+            "youtubeId": "SDzxB27cA_E",
+            "category": "vertical"
+          }
+        ]
+      }
+    ]
+  }
