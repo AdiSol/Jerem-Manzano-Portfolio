@@ -216,7 +216,7 @@ const WorkShowcase: React.FC = () => {
         <YouTubeEmbed videoId={showreelVideoId} />
         
         <WorksCategories>
-          <Link href="https://www.instagram.com/jeremiah.manzano/" /*href="/picture"*/ passHref>
+          <Link href="/picture" passHref>
             <CategoryCard>
               <Image
                 src="/images/picture-showcase.jpg"
@@ -237,7 +237,7 @@ const WorkShowcase: React.FC = () => {
             </CategoryCard>
           </Link>
           
-          <Link href="https://www.youtube.com/@CapuleStudios" /*href="/video"*/ passHref>
+          <Link href="/video" passHref>
             <CategoryCard>
               <Image
                 src="/images/video-showcase.jpg"
