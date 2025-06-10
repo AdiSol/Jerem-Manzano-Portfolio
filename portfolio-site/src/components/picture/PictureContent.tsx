@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react'; // 🔄 ADD: useMemo, useCallback
 import styled from 'styled-components';
 import { mediaQueries } from '../styles/mixins';
 import BeforeAfterComparison from './BeforeAfterComparison';
@@ -61,6 +61,60 @@ const ComparisonSection = styled.div`
   }
 `;
 
+// 🔄 ADD: Enhanced loading indicator with progress
+const LoadingIndicator = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 1.1rem;
+  opacity: 0.7;
+  gap: 1rem;
+`;
+
+const ProgressBar = styled.div`
+  width: 200px;
+  height: 4px;
+  background: #eee;
+  border-radius: 2px;
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div<{ $progress: number }>`
+  width: ${props => props.$progress}%;
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  transition: width 0.3s ease;
+`;
+
+// 🔄 ADD: Error message with retry option
+const ErrorMessage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 1.1rem;
+  color: #e74c3c;
+  gap: 1rem;
+`;
+
+const RetryButton = styled.button`
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background: #0056b3;
+  }
+`;
+
 interface Picture {
   id: string;
   title: string;
@@ -81,96 +135,303 @@ interface PictureData {
   }>;
 }
 
+// 🔄 ADD: Enhanced loading state interface
+interface LoadingState {
+  status: 'loading' | 'success' | 'error';
+  progress: number;
+  message: string;
+}
+
+// 🔄 ADD: Simple image cache for preloading
+class SimpleImageCache {
+  private cache = new Map<string, HTMLImageElement>();
+  private maxSize = 30; // Reasonable cache size
+
+  preload(src: string): Promise<HTMLImageElement> {
+    const cached = this.cache.get(src);
+    if (cached) return Promise.resolve(cached);
+
+    return new Promise((resolve, reject) => {
+      // Clear old entries if cache is full
+      if (this.cache.size >= this.maxSize) {
+        const firstKey = this.cache.keys().next().value;
+        if (firstKey !== undefined) { 
+          this.cache.delete(firstKey);
+        }
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        this.cache.set(src, img);
+        resolve(img);
+      };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+}
+
+// 🔄 ADD: Create cache instance
+const imageCache = new SimpleImageCache();
+
 const PictureContent: React.FC = () => {
   const [pictureData, setPictureData] = useState<PictureData | null>(null);
   const [selectedPicture, setSelectedPicture] = useState<Picture | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  const [loadingState, setLoadingState] = useState<LoadingState>({ // 🔄 MODIFY: Enhanced loading state
+    status: 'loading',
+    progress: 0,
+    message: 'Loading pictures...'
+  });
+
+  // 🔄 ADD: Preload critical images function
+  const preloadCriticalImages = useCallback(async (data: PictureData) => {
+    if (!data.categories.length) return;
+
+    const firstCategory = data.categories[0];
+    if (!firstCategory.pictures.length) return;
+
+    const firstPicture = firstCategory.pictures[0];
+    
+    try {
+      setLoadingState(prev => ({ 
+        ...prev, 
+        message: 'Preloading critical images...',
+        progress: 60 
+      }));
+
+      // Preload the first image's before/after
+      await Promise.all([
+        imageCache.preload(firstPicture.rawImage),
+        imageCache.preload(firstPicture.editedImage)
+      ]);
+
+      setLoadingState(prev => ({ 
+        ...prev, 
+        progress: 80 
+      }));
+
+      // Preload first few thumbnails
+      const thumbnailsToPreload = firstCategory.pictures
+        .slice(0, 4)
+        .map(p => p.editedImage);
+      
+      await Promise.all(
+        thumbnailsToPreload.map(src => imageCache.preload(src))
+      );
+
+      setLoadingState(prev => ({ 
+        ...prev, 
+        progress: 100,
+        message: 'Ready!'
+      }));
+
+    } catch (error) {
+      console.warn('Failed to preload some images:', error);
+      // Continue anyway, just log the warning
+    }
+  }, []);
 
   useEffect(() => {
-  const loadPictureData = async () => {
-    // Define fallback data outside the try-catch
-    const fallbackData: PictureData = {
-      title: "Picture",
-      description: "See the difference!",
-      categories: [
-        {
-          id: "horizontal",
-          name: "Horizontal",
-          pictures: [
-            {
-              id: "landscape-1",
-              title: "Sunset Landscape",
-              description: "Enhanced colors and contrast in this beautiful sunset scene",
-              category: "horizontal",
-              rawImage: "/images/sample-raw.jpg",
-              editedImage: "/images/sample-edited.jpg",
-              orientation: "horizontal"
-            }
-          ]
+    const loadPictureData = async () => {
+      // 🔄 MODIFY: Enhanced fallback data
+      const fallbackData: PictureData = {
+        title: "Picture Portfolio",
+        description: "Professional photo editing showcase - using offline content",
+        categories: [
+          {
+            id: "landscape",
+            name: "Landscape",
+            pictures: [
+              {
+                id: "landscape-1",
+                title: "Mountain Sunrise",
+                description: "Enhanced colors and contrast in this stunning mountain landscape",
+                category: "landscape",
+                rawImage: "/images/landscape/mountain-raw.jpg",
+                editedImage: "/images/landscape/mountain-edited.jpg",
+                orientation: "horizontal"
+              },
+              {
+                id: "landscape-2", 
+                title: "Ocean Vista",
+                description: "Color correction and detail enhancement for this coastal scene",
+                category: "landscape",
+                rawImage: "/images/landscape/ocean-raw.jpg",
+                editedImage: "/images/landscape/ocean-edited.jpg",
+                orientation: "horizontal"
+              }
+            ]
+          },
+          {
+            id: "portrait",
+            name: "Portrait", 
+            pictures: [
+              {
+                id: "portrait-1",
+                title: "Studio Portrait",
+                description: "Professional retouching and color grading",
+                category: "portrait",
+                rawImage: "/images/portrait/studio-raw.jpg",
+                editedImage: "/images/portrait/studio-edited.jpg",
+                orientation: "vertical"
+              }
+            ]
+          }
+        ]
+      };
+
+      try {
+        // 🔄 ADD: Progress updates
+        setLoadingState({
+          status: 'loading',
+          progress: 10,
+          message: 'Fetching picture data...'
+        });
+
+        const response = await fetch('/api/pictures');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      ]
+        
+        setLoadingState(prev => ({ 
+          ...prev, 
+          progress: 30,
+          message: 'Processing data...'
+        }));
+        
+        const data = await response.json();
+        
+        setLoadingState(prev => ({ 
+          ...prev, 
+          progress: 50,
+          message: 'Setting up gallery...'
+        }));
+
+        setPictureData(data);
+        
+        // Set the first category as default
+        if (data.categories && data.categories.length > 0) {
+          const firstCategory = data.categories[0];
+          setSelectedCategory(firstCategory.id);
+          
+          if (firstCategory.pictures.length > 0) {
+            setSelectedPicture(firstCategory.pictures[0]);
+          }
+        }
+
+        // 🔄 ADD: Preload critical images
+        await preloadCriticalImages(data);
+        
+        setLoadingState({
+          status: 'success',
+          progress: 100,
+          message: 'Gallery ready!'
+        });
+        
+      } catch (error) {
+        console.error('Error loading picture data:', error);
+        
+        // 🔄 MODIFY: Better error handling with fallback
+        setPictureData(fallbackData);
+        setSelectedCategory('landscape');
+        setSelectedPicture(fallbackData.categories[0].pictures[0]);
+        
+        // Still preload fallback images
+        await preloadCriticalImages(fallbackData);
+        
+        setLoadingState({
+          status: 'success', // Still show content with fallback
+          progress: 100,
+          message: 'Using offline content'
+        });
+      }
     };
 
-    try {
-      const response = await fetch('/api/pictures');
-      const data = await response.json();
-      setPictureData(data);
-      
-      // Set the first category as default
-      if (data.categories && data.categories.length > 0) {
-        const firstCategory = data.categories[0];
-        setSelectedCategory(firstCategory.id);
-        
-        // Use the first picture in the first category
-        if (firstCategory.pictures.length > 0) {
-          setSelectedPicture(firstCategory.pictures[0]);
-        }
-      }
-      
-    } catch (error) {
-      console.error('Error loading picture data:', error);
-      // Use fallback data
-      setPictureData(fallbackData);
-      setSelectedCategory('horizontal');
-      setSelectedPicture(fallbackData.categories[0].pictures[0]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadPictureData();
+  }, [preloadCriticalImages]); // 🔄 ADD: Dependency
 
-  loadPictureData();
-}, []);
-
-  const handlePictureSelect = (picture: Picture) => {
+  // 🔄 ADD: Optimized picture selection handler with preloading
+  const handlePictureSelect = useCallback((picture: Picture) => {
     setSelectedPicture(picture);
-  };
+    
+    // Preload the newly selected picture's images in background
+    Promise.all([
+      imageCache.preload(picture.rawImage),
+      imageCache.preload(picture.editedImage)
+    ]).catch(error => {
+      console.warn('Failed to preload selected picture:', error);
+    });
+  }, []);
 
-  const handleCategoryFilter = (categoryId: string) => {
+  // 🔄 ADD: Optimized category filter handler with preloading
+  const handleCategoryFilter = useCallback((categoryId: string) => {
     setSelectedCategory(categoryId);
     
-    // When switching categories, show the first picture in that category
     if (pictureData) {
       const category = pictureData.categories.find(cat => cat.id === categoryId);
       if (category && category.pictures.length > 0) {
-        setSelectedPicture(category.pictures[0]);
+        const firstPicture = category.pictures[0];
+        setSelectedPicture(firstPicture);
+        
+        // 🔄 ADD: Preload first few images in the new category
+        const imagesToPreload = category.pictures
+          .slice(0, 3)
+          .flatMap(p => [p.rawImage, p.editedImage]);
+        
+        Promise.all(
+          imagesToPreload.map(src => imageCache.preload(src))
+        ).catch(error => {
+          console.warn('Failed to preload category images:', error);
+        });
       }
     }
-  };
+  }, [pictureData]);
 
-  const getCurrentCategoryPictures = () => {
+  // 🔄 ADD: Retry function for error state
+  const handleRetry = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  // 🔄 ADD: Memoize current category pictures
+  const currentCategoryPictures = useMemo(() => {
     if (!pictureData || !selectedCategory) return [];
     
     const category = pictureData.categories.find(cat => cat.id === selectedCategory);
     return category ? category.pictures : [];
-  };
+  }, [pictureData, selectedCategory]);
 
-  if (loading) {
+  // 🔄 MODIFY: Enhanced loading state rendering
+  if (loadingState.status === 'loading') {
     return (
       <PictureSection>
-        <PictureHeader>
-          <PictureTitle>Loading...</PictureTitle>
-        </PictureHeader>
+        <LoadingIndicator>
+          <div>{loadingState.message}</div>
+          <ProgressBar>
+            <ProgressFill $progress={loadingState.progress} />
+          </ProgressBar>
+          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+            {loadingState.progress}%
+          </div>
+        </LoadingIndicator>
+      </PictureSection>
+    );
+  }
+
+  // 🔄 MODIFY: Enhanced error state rendering
+  if (loadingState.status === 'error') {
+    return (
+      <PictureSection>
+        <ErrorMessage>
+          <div>Failed to load pictures</div>
+          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+            Please check your connection and try again
+          </div>
+          <RetryButton onClick={handleRetry}>
+            Retry
+          </RetryButton>
+        </ErrorMessage>
       </PictureSection>
     );
   }
@@ -178,9 +439,12 @@ const PictureContent: React.FC = () => {
   if (!pictureData) {
     return (
       <PictureSection>
-        <PictureHeader>
-          <PictureTitle>Error loading pictures</PictureTitle>
-        </PictureHeader>
+        <ErrorMessage>
+          <div>No picture data available</div>
+          <RetryButton onClick={handleRetry}>
+            Reload Page
+          </RetryButton>
+        </ErrorMessage>
       </PictureSection>
     );
   }
@@ -194,7 +458,7 @@ const PictureContent: React.FC = () => {
         <CategoryFilter
           categories={pictureData.categories}
           selectedCategory={selectedCategory}
-          onCategorySelect={handleCategoryFilter}
+          onCategorySelect={handleCategoryFilter} // 🔄 MODIFY: Use optimized handler
         />
       </PictureHeader>
 
@@ -202,15 +466,16 @@ const PictureContent: React.FC = () => {
         {selectedPicture && (
           <BeforeAfterComparison
             picture={selectedPicture}
+            priority={true} // 🔄 ADD: Main comparison always gets priority
             key={selectedPicture.id} // Force re-render when picture changes
           />
         )}
       </ComparisonSection>
 
       <PictureCarousel
-        pictures={getCurrentCategoryPictures()}
+        pictures={currentCategoryPictures} // 🔄 MODIFY: Use memoized pictures
         selectedPicture={selectedPicture}
-        onPictureSelect={handlePictureSelect}
+        onPictureSelect={handlePictureSelect} // 🔄 MODIFY: Use optimized handler
       />
     </PictureSection>
   );
