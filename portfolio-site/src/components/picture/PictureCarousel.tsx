@@ -353,7 +353,7 @@ const PictureCarousel: React.FC<PictureCarouselProps> = ({
       <CarouselWrapper>
         <CarouselTrack $translateX={translateX}>
           {pictures.map((picture, index) => {
-            // 🔧 FIXED: Simplified visibility check
+            // Simplified visibility check
             const thumbnailIsVisible = isVisible(picture.id) || getPriorityIndex(index);
             
             return (

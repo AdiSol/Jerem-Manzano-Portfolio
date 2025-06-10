@@ -1,0 +1,54 @@
+{
+  "title": "Picture",
+  "description": "See the difference!",
+  "categories": [
+    {
+      "id": "horizontal",
+      "name": "Horizontal",
+      "pictures": [
+        {
+          "id": "landscape-sunset",
+          "title": "Golden Hour Landscape",
+          "description": "Enhanced colors, improved contrast, and sky replacement to create a dramatic sunset scene.",
+          "category": "horizontal",
+          "rawImage": "/content/pictures/horizontal/MOA-9 raw.jpg",
+          "editedImage": "/content/pictures/horizontal/MOA-9 edit.jpg",
+          "orientation": "horizontal"
+        },
+        {
+          "id": "car-photography",
+          "title": "Cute Dog Shots",
+          "description": "Highlighting the cuteness of Richie!",
+          "category": "horizontal",
+          "rawImage": "/content/pictures/horizontal/PICC March 8, 2025 Picture 21 raw.jpg",
+          "editedImage": "/content/pictures/horizontal/PICC March 8, 2025 Picture 21 edit.jpg",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "id": "vertical",
+      "name": "Vertical",
+      "pictures": [
+        {
+          "id": "fashion-shoot",
+          "title": "Cosplay Photography",
+          "description": "Fashion photo editing with color grading, body retouching, and creative lighting effects.",
+          "category": "vertical",
+          "rawImage": "/content/pictures/vertical/Cosplay-Carnival-42 raw.jpg",
+          "editedImage": "/content/pictures/vertical/Cosplay-Carnival-42 edit.jpg",
+          "orientation": "vertical"
+        },
+        {
+          "id": "portrait-session",
+          "title": "Succubus Cosplay",
+          "description": "Portrait retouching with skin smoothing, color correction, and background enhancement.",
+          "category": "vertical",
+          "rawImage": "/content/pictures/vertical/Cosplay-Carnival-31 raw.jpg",
+          "editedImage": "/content/pictures/vertical/Cosplay-Carnival-31 edit.jpg",
+          "orientation": "vertical"
+        }
+      ]
+    }
+  ]
+}
