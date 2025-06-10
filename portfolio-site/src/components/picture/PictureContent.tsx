@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'; // 🔄 ADD: useMemo, useCallback
+import React, { useState, useEffect, useMemo, useCallback } from 'react'; //  useMemo, useCallback
 import styled from 'styled-components';
 import { mediaQueries } from '../styles/mixins';
 import BeforeAfterComparison from './BeforeAfterComparison';
@@ -61,7 +61,7 @@ const ComparisonSection = styled.div`
   }
 `;
 
-// 🔄 ADD: Enhanced loading indicator with progress
+//  Enhanced loading indicator with progress
 const LoadingIndicator = styled.div`
   display: flex;
   flex-direction: column;
@@ -88,7 +88,7 @@ const ProgressFill = styled.div<{ $progress: number }>`
   transition: width 0.3s ease;
 `;
 
-// 🔄 ADD: Error message with retry option
+//  Error message with retry option
 const ErrorMessage = styled.div`
   display: flex;
   flex-direction: column;
@@ -135,14 +135,14 @@ interface PictureData {
   }>;
 }
 
-// 🔄 ADD: Enhanced loading state interface
+//  Enhanced loading state interface
 interface LoadingState {
   status: 'loading' | 'success' | 'error';
   progress: number;
   message: string;
 }
 
-// 🔄 ADD: Simple image cache for preloading
+//  Simple image cache for preloading
 class SimpleImageCache {
   private cache = new Map<string, HTMLImageElement>();
   private maxSize = 30; // Reasonable cache size
@@ -171,7 +171,7 @@ class SimpleImageCache {
   }
 }
 
-// 🔄 ADD: Create cache instance
+//  Create cache instance
 const imageCache = new SimpleImageCache();
 
 const PictureContent: React.FC = () => {
@@ -184,7 +184,7 @@ const PictureContent: React.FC = () => {
     message: 'Loading pictures...'
   });
 
-  // 🔄 ADD: Preload critical images function
+  //  Preload critical images function
   const preloadCriticalImages = useCallback(async (data: PictureData) => {
     if (!data.categories.length) return;
 
@@ -282,7 +282,7 @@ const PictureContent: React.FC = () => {
       };
 
       try {
-        // 🔄 ADD: Progress updates
+        //  Progress updates
         setLoadingState({
           status: 'loading',
           progress: 10,
@@ -321,7 +321,7 @@ const PictureContent: React.FC = () => {
           }
         }
 
-        // 🔄 ADD: Preload critical images
+        //  Preload critical images
         await preloadCriticalImages(data);
         
         setLoadingState({
@@ -350,9 +350,9 @@ const PictureContent: React.FC = () => {
     };
 
     loadPictureData();
-  }, [preloadCriticalImages]); // 🔄 ADD: Dependency
+  }, [preloadCriticalImages]); //  Dependency
 
-  // 🔄 ADD: Optimized picture selection handler with preloading
+  //  Optimized picture selection handler with preloading
   const handlePictureSelect = useCallback((picture: Picture) => {
     setSelectedPicture(picture);
     
@@ -365,7 +365,7 @@ const PictureContent: React.FC = () => {
     });
   }, []);
 
-  // 🔄 ADD: Optimized category filter handler with preloading
+  //  Optimized category filter handler with preloading
   const handleCategoryFilter = useCallback((categoryId: string) => {
     setSelectedCategory(categoryId);
     
@@ -375,7 +375,7 @@ const PictureContent: React.FC = () => {
         const firstPicture = category.pictures[0];
         setSelectedPicture(firstPicture);
         
-        // 🔄 ADD: Preload first few images in the new category
+        //  Preload first few images in the new category
         const imagesToPreload = category.pictures
           .slice(0, 3)
           .flatMap(p => [p.rawImage, p.editedImage]);
@@ -389,12 +389,12 @@ const PictureContent: React.FC = () => {
     }
   }, [pictureData]);
 
-  // 🔄 ADD: Retry function for error state
+  //  Retry function for error state
   const handleRetry = useCallback(() => {
     window.location.reload();
   }, []);
 
-  // 🔄 ADD: Memoize current category pictures
+  //  Memoize current category pictures
   const currentCategoryPictures = useMemo(() => {
     if (!pictureData || !selectedCategory) return [];
     
@@ -466,7 +466,7 @@ const PictureContent: React.FC = () => {
         {selectedPicture && (
           <BeforeAfterComparison
             picture={selectedPicture}
-            priority={true} // 🔄 ADD: Main comparison always gets priority
+            priority={true} //  Main comparison always gets priority
             key={selectedPicture.id} // Force re-render when picture changes
           />
         )}
