@@ -178,7 +178,7 @@ const PictureContent: React.FC = () => {
   const [pictureData, setPictureData] = useState<PictureData | null>(null);
   const [selectedPicture, setSelectedPicture] = useState<Picture | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [loadingState, setLoadingState] = useState<LoadingState>({ // 🔄 MODIFY: Enhanced loading state
+  const [loadingState, setLoadingState] = useState<LoadingState>({ //  Enhanced loading state
     status: 'loading',
     progress: 0,
     message: 'Loading pictures...'
@@ -234,7 +234,7 @@ const PictureContent: React.FC = () => {
 
   useEffect(() => {
     const loadPictureData = async () => {
-      // 🔄 MODIFY: Enhanced fallback data
+      //  Enhanced fallback data
       const fallbackData: PictureData = {
         title: "Picture Portfolio",
         description: "Professional photo editing showcase - using offline content",
@@ -248,17 +248,8 @@ const PictureContent: React.FC = () => {
                 title: "Mountain Sunrise",
                 description: "Enhanced colors and contrast in this stunning mountain landscape",
                 category: "landscape",
-                rawImage: "/images/landscape/mountain-raw.jpg",
-                editedImage: "/images/landscape/mountain-edited.jpg",
-                orientation: "horizontal"
-              },
-              {
-                id: "landscape-2", 
-                title: "Ocean Vista",
-                description: "Color correction and detail enhancement for this coastal scene",
-                category: "landscape",
-                rawImage: "/images/landscape/ocean-raw.jpg",
-                editedImage: "/images/landscape/ocean-edited.jpg",
+                rawImage: "/images/PICC March 8, 2025 Picture 21 raw.jpg",
+                editedImage: "/images/PICC March 8, 2025 Picture 21 edit.jpg",
                 orientation: "horizontal"
               }
             ]
@@ -272,8 +263,8 @@ const PictureContent: React.FC = () => {
                 title: "Studio Portrait",
                 description: "Professional retouching and color grading",
                 category: "portrait",
-                rawImage: "/images/portrait/studio-raw.jpg",
-                editedImage: "/images/portrait/studio-edited.jpg",
+                rawImage: "/images/Cosplay-Carnival-42 raw.jpg",
+                editedImage: "/images/Cosplay-Carnival-42 edit.jpg",
                 orientation: "vertical"
               }
             ]
@@ -333,7 +324,7 @@ const PictureContent: React.FC = () => {
       } catch (error) {
         console.error('Error loading picture data:', error);
         
-        // 🔄 MODIFY: Better error handling with fallback
+        //  Better error handling with fallback
         setPictureData(fallbackData);
         setSelectedCategory('landscape');
         setSelectedPicture(fallbackData.categories[0].pictures[0]);
@@ -402,7 +393,7 @@ const PictureContent: React.FC = () => {
     return category ? category.pictures : [];
   }, [pictureData, selectedCategory]);
 
-  // 🔄 MODIFY: Enhanced loading state rendering
+  //  Enhanced loading state rendering
   if (loadingState.status === 'loading') {
     return (
       <PictureSection>
@@ -419,7 +410,7 @@ const PictureContent: React.FC = () => {
     );
   }
 
-  // 🔄 MODIFY: Enhanced error state rendering
+  //  Enhanced error state rendering
   if (loadingState.status === 'error') {
     return (
       <PictureSection>
@@ -458,7 +449,7 @@ const PictureContent: React.FC = () => {
         <CategoryFilter
           categories={pictureData.categories}
           selectedCategory={selectedCategory}
-          onCategorySelect={handleCategoryFilter} // 🔄 MODIFY: Use optimized handler
+          onCategorySelect={handleCategoryFilter} //  Use optimized handler
         />
       </PictureHeader>
 
@@ -473,9 +464,9 @@ const PictureContent: React.FC = () => {
       </ComparisonSection>
 
       <PictureCarousel
-        pictures={currentCategoryPictures} // 🔄 MODIFY: Use memoized pictures
+        pictures={currentCategoryPictures} //  Use memoized pictures
         selectedPicture={selectedPicture}
-        onPictureSelect={handlePictureSelect} // 🔄 MODIFY: Use optimized handler
+        onPictureSelect={handlePictureSelect} //  Use optimized handler
       />
     </PictureSection>
   );
